@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Lichess stats demo application</title>
+        <link rel="icon" href="https://lichess1.org/assets/logo/lichess-pad12.svg">
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    </head>
+    <body>
+        <div class="container-fluid text-center">
+            <form class="col-md-4 offset-md-4">
+                <div class="mb-3">
+                  <label for="username" class="form-label">Username</label>
+                  <input type="text" class="form-control" id="username" aria-describedby="usernameHelp">
+                  <div id="usernameHelp" class="form-text">Lichess Player name</div>
+                </div>
+                <button id="submit-btn" class="btn btn-primary">Submit</button>
+
+                <div id="spinner" style="display: none;" class="spinner-border" role="status"></div>
+            </form>
+
+            <table class="table">
+                <thead>
+                  <tr>
+                    <th scope="col">ECO</th>
+                    <th scope="col">Opening Name</th>
+                    <th scope="col">Winrate</th>
+                    <th scope="col">Total Games</th>
+                  </tr>
+                </thead>
+                <tbody id="table-body">
+                </tbody>
+              </table>
+        </div>
+        
+        
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+        <script src="dist/lichess-stats.js"></script>
+        <script>
+
+            function getWinrate(winrate) {
+                var total = winrate.win + winrate.draw + winrate.lose;
+                var code = '<div class="progress"><div class="progress-bar bg-success" role="progressbar" style="width: {win}%" aria-valuenow="{win}" aria-valuemin="0" aria-valuemax="100"></div><div class="progress-bar bg-warning" role="progressbar" style="width: {draw}%" aria-valuenow="{draw}" aria-valuemin="0" aria-valuemax="100"></div><div class="progress-bar bg-danger" role="progressbar" style="width: {lose}%" aria-valuenow="{lose}" aria-valuemin="0" aria-valuemax="100"></div></div>';
+                code = code.replaceAll('{win}', Math.round((100 * winrate.win) / total));
+                code = code.replaceAll('{draw}', Math.round((100 * winrate.draw) / total));
+                code = code.replaceAll('{lose}', Math.round((100 * winrate.lose) / total));
+                return code;
+            }
+
+            function sortByTotal(a, b) {
+                if (a.win + a.draw + a.lose < b.win + b.draw + b.lose) {
+                    return 1;
+                }
+                if (a.win + a.draw + a.lose > b.win + b.draw + b.lose) {
+                    return -1;
+                }
+                return 0;
+            }
+
+            function getECOLink(eco) {
+                var code = '<a href="https://www.365chess.com/eco/{ECO}">{ECO}</a>';
+                code = code.replaceAll("{ECO}", eco);
+                return code;
+            }
+            
+            $("form").on('submit',function(e){
+                e.preventDefault();
+                $("#submit-btn").prop("disabled",true);
+                $("#spinner").css("display", "block");
+                LichessStats($("#username").val(), games => {
+                    games.sort(sortByTotal).forEach(game => {
+                        var winrate = new Winrate(game.win, game.draw, game.lose);
+                        var total = game.win + game.draw + game.lose;
+                        $( "<tr><td>" + getECOLink(game.ECO) + "</td><td>" + game.Opening + "</td><td>" + getWinrate(winrate) + "</td><td>" + total + "(" + winrate.toString() + ")</td></tr>" ).appendTo( $( "#table-body" ) );
+                    });
+                    $("#submit-btn").prop("disabled", false);
+                    $("#spinner").css("display", "none");
+                });
+            });
+        </script>
+    </body>
+</html>

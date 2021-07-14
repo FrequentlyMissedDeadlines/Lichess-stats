@@ -1,0 +1,33 @@
+{
+  "name": "lichess-stats",
+  "version": "1.0.0",
+  "description": "Get useful information from Lichess open data",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "jshint src",
+    "watch": "webpack --watch",
+    "build": "webpack"
+  },
+  "files": [
+    "README.md",
+    "package.json",
+    "LICENSE",
+    "CHANGELOG.md",
+    "dist/lichess-stats.js"
+  ],
+  "author": "FrequentlyMissedDeadlines",
+  "license": "MIT",
+  "dependencies": {
+    "chess-pgn-parser": "^1.3.9",
+    "command-line-args": "^5.1.3",
+    "command-line-usage": "^6.1.1"
+  },
+  "devDependencies": {
+    "express": "^4.17.1",
+    "jshint": "^2.13.0",
+    "node-polyfill-webpack-plugin": "^1.1.4",
+    "webpack": "^5.44.0",
+    "webpack-cli": "^4.7.2"
+  }
+}
